@@ -1,0 +1,99 @@
+<script src="../simpletest.js"></script>
+<script>
+  //Notes:
+
+  //Syntax: arr.join([separator])
+
+  //Creates and returns a new string by concatenating all of the elements in an array
+
+  //Elements are seperated by a comma by default unless an optional Seperator argument is given
+
+  //If an element has 1 item, that item will be returned without the use of a seperator
+  //If arr.length is 0, the empty string is returned.
+  //If an element is undefined, null or an empty array [], it is converted to an empty string.
+
+  //Seperator:
+  //Specifies a string to separate each pair of adjacent elements of the array
+  //Converted to a string if necessary
+  //If omitted, the array elements are separated with a comma
+  //If separator is an empty string, all elements are joined without any characters in between them.
+
+  function join(originalArray, optionalSeperator) {
+    var length = originalArray.length;
+    var returnString = "";
+    var seperator = ",";
+
+    if (optionalSeperator) {
+      if (typeof optionalSeperator === "string") {
+        seperator = optionalSeperator;
+      } else {
+        seperator = optionalSeperator.toString();
+      }
+    }
+
+    for (var i = 0; i < length; i++) {
+      if (originalArray[i] === undefined || null) {
+        returnString += "" + seperator;
+      } else if (i === length - 1) {
+        returnString += originalArray[i];
+      } else if (optionalSeperator === "") {
+        returnString += originalArray[i];
+      } else {
+        returnString += originalArray[i] + seperator;
+      }
+    }
+
+    return returnString;
+  }
+
+  tests({
+    "It should return a new string": function () {
+      var testArray = [1, 2, 3];
+      result = join(testArray);
+      seq(typeof result, "string");
+    },
+    "It should return a string concatenating all the elements in the array": function () {
+      var testArray = [1, 2, 3];
+      result = join(testArray);
+      seq(result, "1,2,3");
+    },
+    "It should return an empty string if the array it is called on has a length of 0": function () {
+      var testArray = [];
+      result = join(testArray);
+      seq(result, "");
+    },
+    "If should return one item without seperators if it is called on an array with 1 item": function () {
+      var testArray = ["watchandcode"];
+      result = join(testArray);
+      seq(result, "watchandcode");
+    },
+    "If should convert any undefined, null or empty elements into an empty string": function () {
+      var testArray = [, "javascript"];
+      result = join(testArray);
+      seq(result, ",javascript");
+    },
+    "It should seperate all of the elements with a comma by default": function () {
+      var testArray = ["react", "javascript", "node"];
+      result = join(testArray);
+      seq(result, "react,javascript,node");
+    },
+    "It should take an optional seperator argument to change the default behavior of using a comma": function () {
+      var testArray = ["MongoDB", "Express", "React", "Node"];
+      result = join(testArray, "+");
+      seq(result, "MongoDB+Express+React+Node");
+    },
+    "It should convert the seperator argument to a string if it isn't already a string": function () {
+      // debugger;
+      var testArray = ["MongoDB", "Express", "React", "Node"];
+      var seperator = 1;
+      result = join(testArray, seperator);
+      seq(result, "MongoDB1Express1React1Node");
+    },
+    "It should join all elements without any characters between them if the seperator is an empty string": function () {
+      // debugger;
+      var testArray = [1, 2, 3];
+      result = join(testArray, "");
+      seq(result, "123");
+    },
+  });
+</script>

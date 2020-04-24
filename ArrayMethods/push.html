@@ -1,0 +1,89 @@
+<script src="../simpletest.js"></script>
+<script>
+  //Notes:
+
+  //Syntax:  arr.push(element1[, ...[, elementN]])
+
+  // Adds one or more elements to the end of an array and returns the new length of the array.
+
+  //Paramaters:
+  //ElementN:  The element or elements to add to the end of the array
+  //Return Value:  The new length of the object upon which push() was called
+
+  //Relies on a length property to determine where to start inserting the given values
+  //If the length property cannot be converted into a number, the index used is 0
+  //If called on empty array, length will be 0
+  //If no arguments are given, it will return the current length of the array it was called on
+  // If provided one or more arguments, it will add these arguments to the array in the order in which they are written.
+
+  function push(originalArray) {
+    var length = originalArray.length;
+
+    if (arguments.length < 1) {
+      throw new TypeError("No array was provided");
+    } else if (
+      arguments.length === 1 &&
+      Array.isArray(arguments[0]) === false
+    ) {
+      throw new TypeError("Value provided is not an Array");
+    }
+
+    if (length === 0) {
+      return 0;
+    }
+    if (arguments.length > 1) {
+      for (var i = 1; i < arguments.length; i++) {
+        originalArray[length] = arguments[i];
+        length++;
+      }
+    }
+
+    return length;
+  }
+
+  tests({
+    "It should return 0 if called on an empty array": function () {
+      var testArray = [];
+      var result = push(testArray);
+      seq(result, 0);
+    },
+    "It should return the current length of the array it's called on if no arguments are given": function () {
+      var testArray = [1, 2, 3];
+      var result = push(testArray);
+      seq(result, 3);
+    },
+    "It should return the new length of the array on which it was called, if arguments were provided": function () {
+      // debugger;
+      var testArray = [1, 2, 3];
+      var result = push(testArray, 1);
+      seq(result, 4);
+    },
+    "It should take an element(s) as an argument and append them to the end of the array": function () {
+      var testArray = [1, 2, 3];
+      var result = push(testArray, "apple");
+      seq(testArray[3], "apple");
+      seq(result, 4);
+    },
+    "It should accept multiple arguments": function () {
+      var testArray = [1, 2, 3];
+      var result = push(testArray, "apple", "orange");
+
+      seq(result, 5);
+    },
+    "It should add the arguments to the end of the array in the order they were given": function () {
+      var testArray = [1, 2, 3];
+      var result = push(testArray, "apple", "orange");
+      seq(testArray[3], "apple");
+      seq(testArray[4], "orange");
+    },
+    "It should throw a TypeError in the event that it is called on a non-array like object": function () {
+      var isTypeError = false;
+      try {
+        push("notAnArray");
+      } catch (e) {
+        var isTypeError = e instanceof TypeError;
+      }
+      eq(isTypeError, true);
+    },
+  });
+</script>

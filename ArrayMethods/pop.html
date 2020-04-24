@@ -1,0 +1,58 @@
+<script src="../simpletest.js"></script>
+<script>
+  //Notes:
+
+  //Syntax: arr.pop()
+
+  //Removes the last element from an array and returns that element.
+  //Changes the length of the array
+  //Returns undefined if the array is empty
+  //It should work for removing holes
+
+  function pop(array) {
+    var length = array.length;
+
+    if (length === 0) {
+      return undefined;
+    }
+
+    for (var i = 0; i < length; i++) {
+      if (i === length - 1) {
+        var returnValue = array[i];
+        array.length = array.length - 1;
+        return returnValue;
+      }
+    }
+  }
+
+  tests({
+    "It should remove the last element from the array it was called on": function () {
+      // debugger;
+      var testArray = [1, 2, 3];
+      pop(testArray);
+      seq(testArray.length, 2);
+      seq(testArray[2], undefined);
+    },
+    "It should change the length of the array to array.length - 1": function () {
+      var testArray = [1, 2, 3, 4];
+      pop(testArray);
+      seq(testArray.length, 3);
+    },
+    "It should work for removing holes from an array": function () {
+      // debugger;
+      var testArray = [1, 2, 3, , ,];
+      pop(testArray);
+      seq(testArray.length, 4);
+    },
+    "It should return undefined if called on an empty array": function () {
+      var testArray = [];
+      var result = pop(testArray);
+      seq(result, undefined);
+    },
+    "It should return the value of the element which was removed": function () {
+      var testArray = [5, 8, 7, 3];
+      result = pop(testArray);
+      seq(result, 3);
+    },
+  });
+</script>

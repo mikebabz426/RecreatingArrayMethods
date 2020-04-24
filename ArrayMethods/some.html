@@ -1,0 +1,121 @@
+<script src="/simpletest.js"></script>
+<script>
+  //Structure: some(array, callback(element[, index[, array]])[, thisArg]);
+
+  //true if the callback function returns a truthy value for at least one element in the array. Otherwise, false.
+
+  // Executes the callback function once for each element present
+
+  // Invoked only for elements which have assigned values
+
+  // Not invoked for indexes which have been deleted or have unassigned values
+
+  //Callback Parameters:  (element, index, array)
+
+  //If a thisArg parameter is provided to some, it will be used as the callback's this value.
+
+  //some() does not mutate the array on which it is called.
+
+  // Elements appended to the array after the call, will not be visited
+
+  //Deleted Elements are not visited
+
+  function some(originalArray, callback, optionalThis) {
+    var someCallback = callback;
+    var length = originalArray.length;
+
+    if (optionalThis) {
+      someCallback = callback.bind(optionalThis);
+    }
+
+    for (var i = 0; i < length; i++) {
+      if (originalArray[i] === undefined) {
+        continue;
+      } else if (someCallback(originalArray[i], i, originalArray)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  tests({
+    "It should run the callback function array.length times.": function() {
+      var count = 0;
+      some([1, 2, 3, 4], function() {
+        count++;
+      });
+      seq(count, 4);
+    },
+    "It should pass in the i-th element as the first argument to the callback.": function() {
+      some([1], function(element) {
+        seq(element, 1);
+      });
+    },
+    "It should pass in the i-th position as the second argument to the callback.": function() {
+      some([1], function(element, position) {
+        seq(position, 0);
+      });
+    },
+    "It should pass the original array as the third argument to the callback.": function() {
+      var testArray = [1, 2, 3];
+      some(testArray, function(element, position, originalArray) {
+        seq(originalArray, testArray);
+      });
+    },
+    "It should accept an optional This object.": function() {
+      some(
+        [1, 2, 3],
+        function() {
+          seq(this.name, "Mike");
+        },
+        { name: "Mike" }
+      );
+    },
+    "It should return true if the callback returns a truthy value for any  element in the array.": function() {
+      var result = some([1, 2, 3, 4, 9], function(number) {
+        return number < 2;
+      });
+      seq(result, true);
+    },
+    "It should return false if the callback does NOT return a truthy value for any element in the array.": function() {
+      var result = some([1, 2, 3, 4, 9], function(number) {
+        return number > 10;
+      });
+      seq(result, false);
+    },
+    "It should return false for any condition if its called on an empty array.": function() {
+      result = some([], function() {});
+      seq(result, false);
+    },
+    "It should not run on elements appended after the call to some().": function() {
+      var testArray = [1, 2, 3, 4, 3];
+      var result = some(testArray, function(number, index) {
+        // count++;
+        if (index === 0) {
+          testArray.push(6);
+        }
+        return number > 4;
+      });
+      seq(result, false);
+    },
+    "It should not run on elements deleted after the call to some().": function() {
+      var count = 0;
+      var testArray = [5, 2, 1, 4, 3];
+      var result = some(testArray, function(number, index) {
+        count++;
+        if (index === 0) {
+          delete testArray[2];
+        }
+      });
+
+      seq(count, 4);
+    },
+    "It should run only on elements which have assigned values": function() {
+      var count = 0;
+      result = some([6, , , , 7, 5], function(number) {
+        count++;
+      });
+      seq(count, 3);
+    }
+  });
+</script>

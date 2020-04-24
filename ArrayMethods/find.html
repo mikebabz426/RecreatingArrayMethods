@@ -1,0 +1,100 @@
+<script src="../simpletest.js"></script>
+<script>
+  // <!-- Returns the value of the first element in the provided array that satisfies
+  // the provided testing function.  -->
+
+  // <!-- Structure:  find(callback(element, index, [array])[, thisArg])  -->
+
+  // <!-- executes the callback function once for every index of
+  // the array  -->
+
+  // <!-- returns element returning truthy value else returns undefined -->
+
+  // <!-- optional this value -->
+
+  // iterates over all elements, including deleted or unassigned
+
+  //callback paramaters:
+  //element
+  //index
+  //array
+
+  function find(originalArray, callback, optionalThis) {
+    boundCallback = callback;
+
+    if (optionalThis) {
+      boundCallback = callback.bind(optionalThis);
+    }
+
+    for (var i = 0; i < originalArray.length; i++) {
+      if (boundCallback(originalArray[i], i, originalArray)) {
+        return originalArray[i];
+      }
+    }
+  }
+
+  tests({
+    "It should run the callback function array.length times.": function () {
+      var count = 0;
+      find([1, 2, 3], function () {
+        count++;
+      });
+      seq(count, 3);
+    },
+    "It should pass in the i-th element as the first argument to the callback.": function () {
+      find([1], function (element) {
+        seq(element, 1);
+      });
+    },
+    "It should pass in the i-th position as the second argument to the callback": function () {
+      find([1], function (element, position) {
+        seq(position, 0);
+      });
+    },
+    "It should pass the original array as the third argument to the callback": function () {
+      var testArray = [1, 2, 3];
+      find(testArray, function (element, position, originalArray) {
+        seq(originalArray, testArray);
+      });
+    },
+    "It should accept an optional This object": function () {
+      find(
+        [1],
+        function () {
+          seq(this.name, "Mike");
+        },
+        { name: "Mike" }
+      );
+    },
+    "It should return the value of the first element in the array that satisfies callback testing function": function () {
+      var testArray = [1, 7, 14, 9, 12, 2];
+      returnValue = find(testArray, function (number) {
+        return number > 8;
+      });
+      seq(returnValue, 14);
+    },
+    "It should return undefined if there are no elements satisfying the callback testing function": function () {
+      var result = find([1, 7, 14, 9, 12, 2], function (number) {
+        return number > 14;
+      });
+      seq(result, undefined);
+    },
+    "It should run through each element, including those with unassigned values.": function () {
+      var testArray = [1, 7, , , 12, 2];
+      var counter = 0;
+      var result = find(testArray, function (number) {
+        counter++;
+      });
+      seq(counter, 6);
+    },
+    "It should run through each element, including those with deleted values.": function () {
+      var testArray = [1, 7, , , 12, 2];
+      var result = find(testArray, function (number, index) {
+        if (index === 0) {
+          delete testArray[1];
+        }
+      });
+      seq(testArray[1], undefined);
+    },
+  });
+</script>

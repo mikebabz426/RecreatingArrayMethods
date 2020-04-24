@@ -1,0 +1,118 @@
+<script src="../simpletest.js"></script>
+<script>
+  //Notes:
+
+  //Syntax:  arr.fill(value[, start[, end]]);
+
+  //It should change all specified elements in an array to a static value
+
+  //It should take 3 paramaters: 1 value to fill array with & a start + end index
+
+  //Default:  start index 0 / end index array.length
+
+  //It returns the modified array
+
+  //If start is negative, it is treated as array.length + start.
+
+  //If end is negative, it is treated as array.length + end.
+
+  //End index is not included and fill will not assign a value to it
+
+  //If an index range specified in the paramaters does not exist on the array: return original array
+
+  //*************************************************************************************************
+
+  function fill(array, value, startIndex, endIndex) {
+    var length = array.length;
+    var index;
+
+    if (startIndex > length - 1) {
+      return array;
+    }
+
+    if (startIndex >= 0) {
+      index = startIndex;
+    } else if (startIndex < 0) {
+      index = array.length + startIndex;
+    } else {
+      index = 0;
+    }
+
+    if (endIndex >= 0 && endIndex < array.length) {
+      length = endIndex;
+    } else if (endIndex < 0) {
+      length = length + endIndex;
+    } else if (endIndex > array.length - 1) {
+      length = array.length;
+    }
+
+    for (var i = index; i < length; i++) {
+      array[i] = value;
+    }
+
+    return array;
+  }
+
+  tests({
+    "It should fill an array with a specified value for all indexes by default": function () {
+      // debugger;
+      var testArray = [1, 2];
+      fill(testArray, 4);
+      seq(testArray[0], 4);
+      seq(testArray[1], 4);
+      seq(testArray.length, 2);
+    },
+    "It should fill a specific segment in the array, if provided with an index range": function () {
+      var testArray = [1, 2];
+      fill(testArray, 4, 0, 1);
+      seq(testArray[0], 4);
+      seq(testArray[1], 2);
+      seq(testArray.length, 2);
+    },
+    "It should return the modified array": function () {
+      var testArray = [1, 2, 3];
+      fill(testArray, 4, 0, 2);
+      seq(testArray[0], 4);
+      seq(testArray[1], 4);
+      seq(testArray[2], 3);
+      seq(testArray.length, 3);
+    },
+    "It should use a negative start index as an offset from the end of the array": function () {
+      var testArray = [1, 2, 3];
+      fill(testArray, 4, -2);
+      seq(testArray[0], 1);
+      seq(testArray[1], 4);
+      seq(testArray[2], 4);
+      seq(testArray.length, 3);
+    },
+    "It should use a negative end index as an offset from the end of the array": function () {
+      var testArray = [1, 2, 3];
+      fill(testArray, 4, -2, -1);
+      seq(testArray[0], 1);
+      seq(testArray[1], 4);
+      seq(testArray[2], 3);
+      seq(testArray.length, 3);
+    },
+    "It should not fill a value in for the end index": function () {
+      var testArray = [1, 2, 3];
+      fill(testArray, 7, 0, 2);
+
+      seq(testArray[2], 3);
+    },
+    "It should return the original array if the index range does not exist on that array": function () {
+      // debugger;
+      var testArray = [1, 2, 3, 4, 5];
+      result = fill(testArray, 7, 8, 12);
+
+      seq(testArray, result);
+      seq(testArray.length, 5);
+    },
+    "It should not modify the length of the array if end index exceeds array length ": function () {
+      // debugger;
+      var testArray = [1, 2, 3, 4, 5];
+      result = fill(testArray, 7, 1, 12);
+
+      seq(testArray.length, 5);
+    },
+  });
+</script>

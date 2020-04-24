@@ -1,0 +1,178 @@
+<script src="../simpletest.js"></script>
+<script>
+  //Notes:
+
+  //Syntax:  arr.sort([compareFunction]);
+
+  //Sorts the elements of an array in place
+
+  //Returns the sorted array (array is sorted in place - no copy is made)
+
+  //The default sort order is ascending (compares UTF-16 code unit values)
+
+  //Paramaters:
+  //    -Compare Function:  Specifies a function that defines the sort order.
+  //                        If omitted the array is sorted in ascending order based on UTF-16
+  //                        Takes an argument for first Element to be compared
+  //                        Takes an argument for second Element to be compared
+
+  function sort(array, callback) {
+    var length = array.length;
+    var endIndex = length - 1;
+    var stringArray = [];
+    var sortedArr = [];
+    //If no callback given, turn elements into strings before comparison
+    if (arguments.length === 1) {
+      for (var i = 0; i < length; i++) {
+        stringArray[i] = JSON.stringify(array[i]);
+      }
+    }
+    //Comparing the each value against the rest
+    for (var i = 0; i < length; i++) {
+      var indexCounter = 0;
+      var negativeCounter = 0;
+      var sameValue = 0;
+
+      for (var j = 0; j < length; j++) {
+        if (callback) {
+          if (array[i] === undefined) {
+            if (array[j] === undefined) {
+              continue;
+            }
+            indexCounter++;
+          } else if (array[i] !== undefined && array[j] === undefined) {
+            negativeCounter--;
+          } else if (callback(array[i], array[j]) > 0) {
+            indexCounter++;
+          } else if (callback(array[i], array[j]) < 0) {
+            negativeCounter--;
+          } else {
+            sameValue++;
+            negativeCounter--;
+          }
+          //Sorts the elements in a seperate holder array
+          if (j === endIndex) {
+            if (indexCounter > 0) {
+              if (sameValue > 1) {
+                for (var k = 0; k < sameValue; k++) {
+                  sortedArr[indexCounter + k] = array[i];
+                }
+              }
+              sortedArr[indexCounter] = array[i];
+            } else {
+              if (sameValue > 1) {
+                for (var k = 0; k < sameValue; k++) {
+                  sortedArr[length + negativeCounter + k] = array[i];
+                }
+              } else {
+                sortedArr[length + negativeCounter] = array[i];
+              }
+            }
+          }
+        } else {
+          if (stringArray[i] === undefined) {
+            if (stringArray[j] === undefined) {
+              continue;
+            }
+            indexCounter++;
+          }
+          if (stringArray[i] > stringArray[j]) {
+            indexCounter++;
+          }
+          if (stringArray[i] === stringArray[j]) {
+            sameValue++;
+          }
+          //Sorting the array
+          if (j === endIndex) {
+            //Sorting same values together
+            if (sameValue > 1) {
+              for (var k = 0; k < sameValue; k++) {
+                sortedArr[indexCounter + k] = stringArray[i];
+              }
+            }
+
+            sortedArr[indexCounter] = stringArray[i];
+          }
+        }
+      }
+    }
+    //Modifies original array to reflect the sorting
+    if (arguments.length === 1) {
+      for (var i = 0; i < length; i++) {
+        if (array[i] === undefined) {
+          array[i] === sortedArr[i];
+        } else {
+          array[i] = JSON.parse(sortedArr[i]);
+        }
+      }
+    } else {
+      for (var i = 0; i < length; i++) {
+        array[i] = sortedArr[i];
+      }
+    }
+
+    return array;
+  }
+
+  tests({
+    "It should sort the elements of an array in place": function () {
+      // debugger;
+      var testArray = [1, 2, 1];
+      sort(testArray);
+      seq(testArray[0], 1);
+      seq(testArray[1], 1);
+      seq(testArray[2], 2);
+    },
+    "It should return the original array in its sorted form": function () {
+      var testArray = [4, 2, 1];
+      var result = sort(testArray);
+      seq(testArray, result);
+    },
+    "It should sort in ascending order by comparing the string version of the elements": function () {
+      var array1 = [1, 30, 4, 21, 100000];
+      sort(array1);
+      seq(array1[0], 1);
+      seq(array1[1], 100000);
+      seq(array1[2], 21);
+      seq(array1[3], 30);
+      seq(array1[4], 4);
+    },
+    "It should take an optional callback to define the sort order": function () {
+      var array1 = [1, 30, 4, 21, 100000];
+      sort(array1, function (a, b) {
+        return a - b;
+      });
+      seq(array1[0], 1);
+      seq(array1[1], 4);
+      seq(array1[2], 21);
+      seq(array1[3], 30);
+      seq(array1[4], 100000);
+    },
+    "It should work for different types of values including strings and sort based on UTF-16 code units": function () {
+      var months = ["March", "Jan", "Feb", "Dec"];
+      sort(months);
+      seq(months[0], "Dec");
+      seq(months[1], "Feb");
+      seq(months[2], "Jan");
+      seq(months[3], "March");
+    },
+    "It should work with undefined values for elements, and sort them to the end of the array": function () {
+      var months = ["March", "Jan", ,];
+      // debugger;
+      sort(months);
+      seq(months[0], "Jan");
+      seq(months[1], "March");
+      seq(months[2], undefined);
+      seq(months[3], undefined);
+    },
+    "It should work with multiple elements holding the same value": function () {
+      var months = ["Jan", "Jan", undefined, undefined];
+      // debugger;
+      sort(months);
+      seq(months[0], "Jan");
+      seq(months[1], "Jan");
+      seq(months[2], undefined);
+      seq(months[3], undefined);
+    },
+  });
+</script>

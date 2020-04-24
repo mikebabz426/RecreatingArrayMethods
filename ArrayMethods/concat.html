@@ -1,0 +1,117 @@
+<script src="../simpletest.js"></script>
+<script>
+  // Notes:
+
+  //Syntax:  const new_array = old_array.concat([value1[, value2[, ...[, valueN]]]])
+
+  // Merges two or more arrays or values, into a single new array
+  // It does not recurse into nested array arguments.
+  // It creates a shallow-copy of the array or arrays used to concatinate
+  // Does not modify the original arrays passed as arguments, or the array on which concat is called;
+  // Works with single values as well as arrays
+  // Works with strings as well as numbers
+
+  function concat() {
+    var newArray = [];
+
+    for (var i = 0; i < arguments.length; i++) {
+      var array = arguments[i];
+      if (arguments[i] === arguments[0]) {
+        var indexCounter = 0;
+      }
+
+      if (Array.isArray(array) === true) {
+        for (var j = 0; j < array.length; j++) {
+          newArray[indexCounter] = array[j];
+          indexCounter++;
+        }
+      } else {
+        newArray[indexCounter] = array;
+        indexCounter++;
+      }
+    }
+
+    return newArray;
+  }
+
+  tests({
+    "It should return a new array": function () {
+      var testArray = [1, 2];
+      var newArray = concat(testArray);
+
+      seq(newArray === testArray, false);
+    },
+    "It should return a new array comprised of the arguments passed into concat()": function () {
+      var testArray = [1, 2];
+      var newArray = concat(testArray);
+
+      seq(newArray[0], 1);
+      seq(newArray[1], 2);
+    },
+    "It should create the new array by combining the arguments in the order they were passed": function () {
+      var testArray = [1, 2];
+      var testArray2 = [3, 4];
+      var newArray = concat(testArray, testArray2);
+
+      seq(newArray[0], 1);
+      seq(newArray[1], 2);
+      seq(newArray[2], 3);
+      seq(newArray[3], 4);
+    },
+    "It should work with strings and numbers": function () {
+      var testArray = [1, 2];
+      var stringArray = ["a", "b"];
+      var alphaNumeric = concat(testArray, stringArray);
+
+      seq(alphaNumeric[0], 1);
+      seq(alphaNumeric[1], 2);
+      seq(alphaNumeric[2], "a");
+      seq(alphaNumeric[3], "b");
+    },
+    "It should NOT modify the original arrays or values passed as arguments": function () {
+      var testArray = [1, 2];
+      var testArray2 = [3, 4];
+      var newArray = concat(testArray, testArray2);
+      newArray.unshift(0);
+
+      seq(testArray[0], 1);
+      seq(testArray[1], 2);
+      seq(testArray.length, 2);
+    },
+    "It should work with single values as well as arrays": function () {
+      var testArray = [1, 2];
+      var testValue = 5;
+      var newArray = concat(testArray, testValue);
+
+      seq(newArray[0], 1);
+      seq(newArray[1], 2);
+      seq(newArray[2], 5);
+    },
+    "It should copy object references into the new array": function () {
+      var internalObject = [5, 6];
+      var testArray = [1, 2];
+      var testArray2 = [3, 4, internalObject];
+      var newArray = concat(testArray, testArray2);
+
+      seq(newArray[0], 1);
+      seq(newArray[1], 2);
+      seq(newArray[2], 3);
+      seq(newArray[3], 4);
+      seq(newArray[4], internalObject);
+    },
+    "If an object is modified it should reflect in both the original and the new array": function () {
+      var internalObject = [5, 6];
+      var testArray = [1, 2];
+      var testArray2 = [3, 4, internalObject];
+      var newArray = concat(testArray, testArray2);
+
+      internalObject.push(7);
+
+      seq(newArray[0], 1);
+      seq(newArray[1], 2);
+      seq(newArray[2], 3);
+      seq(newArray[3], 4);
+      seq(newArray[4], internalObject);
+    },
+  });
+</script>

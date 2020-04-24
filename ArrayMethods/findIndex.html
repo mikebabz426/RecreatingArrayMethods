@@ -1,0 +1,101 @@
+<script src="../simpletest.js"></script>
+<script>
+  // Takes array
+  // Takes callback function to execute on each value in the array until it returns true
+  //Takes an optional This Argument
+  //Returns the index of the first element in the array that passes the testing callback
+  //If no element satisfies callback requirements, return -1
+  //If array length is equal to 0, it will again return -1
+  //Runs for every element, including elements with unassigned values
+  //Elements that are deleted are still visited.
+
+  //Callback Parameters:
+  //element
+  //index
+  //array
+
+  //
+  function findIndex(originalArray, callback, optionalThis) {
+    fiCallback = callback;
+    if (optionalThis) {
+      fiCallback = callback.bind(optionalThis);
+    }
+
+    for (var i = 0; i < originalArray.length; i++) {
+      if (fiCallback(originalArray[i], i, originalArray)) {
+        return i;
+      }
+    }
+    return -1;
+  }
+
+  tests({
+    "It should run the callback function array.length times.": function() {
+      var count = 0;
+      findIndex([1, 2, 3, 4], function() {
+        count++;
+      });
+      seq(count, 4);
+    },
+    "It should pass in the i-th element as the first argument to the callback.": function() {
+      findIndex([1], function(element) {
+        seq(element, 1);
+      });
+    },
+    "It should pass in the i-th position as the second argument to the callback": function() {
+      findIndex([1], function(element, position) {
+        seq(position, 0);
+      });
+    },
+    "It should pass the original array as the third argument to the callback": function() {
+      var testArray = [1, 2, 3];
+      findIndex(testArray, function(element, position, originalArray) {
+        seq(originalArray, testArray);
+      });
+    },
+    "It should accept an optional This object": function() {
+      findIndex(
+        [1, 2, 3],
+        function() {
+          seq(this.name, "Mike");
+        },
+        { name: "Mike" }
+      );
+    },
+    "It should return the position of the FIRST element in the array that satisfies callback testing function": function() {
+      var testArray = [1, 2, 3, 4, 3, 5];
+      var index = findIndex(testArray, function(number) {
+        return number === 3;
+      });
+      seq(index, 2);
+    },
+    "It should return -1 if no element passed the testing callback": function() {
+      var index = findIndex([1, 2, 3], function(number) {
+        return number === 4;
+      });
+      seq(index, -1);
+    },
+    "It should return -1 if array length is 0.": function() {
+      var index = findIndex([], function(number) {
+        return number > 1;
+      });
+      seq(index, -1);
+    },
+    "It should run through every element, including ones with unassigned values": function() {
+      var index = findIndex([1, , , 2, 3], function(number) {
+        return number === undefined;
+      });
+      seq(index, 1);
+    },
+    "It should run through every element, including deleted ones": function() {
+      var testArray = [1, 2, 3, 4, 5];
+      var index = findIndex(testArray, function(number, position) {
+        if (position === 0) {
+          delete testArray[3];
+        }
+        return number === undefined;
+      });
+      seq(index, 3);
+    }
+  });
+</script>

@@ -1,0 +1,57 @@
+<script src="../simpletest.js"></script>
+<script>
+  //Notes:
+
+  //Syntax:  arr.unshift(element1[, ...[, elementN]]);
+
+  //Adds one or more elements to the beginning of an array
+  //Returns the new length of the array
+
+  //If multiple elements are passed to unshift(), they are inserted together one time at the beginning of the array
+
+  //If called on an array with no arguments passed, it will return the original length of the array
+
+  function unshift(array) {
+    if (arguments.length > 1) {
+      for (var i = 0; i < arguments.length - 1; i++) {
+        array.length = array.length + 1; //creates new array indexes
+        array[arguments.length + i - 1] = array[i]; //shifts original array elements
+        array[i] = arguments[i + 1]; //inserts new values in the begining of the array
+      }
+    }
+    return array.length;
+  }
+
+  tests({
+    "It should add all elements passed into unshift() to the begining of the array it was called on": function () {
+      // debugger;
+      var testArray = [4, 5, 6];
+      unshift(testArray, 1, 2, 3);
+      seq(testArray.length, 6);
+      seq(testArray[0], 1);
+      seq(testArray[5], 6);
+    },
+    "It should return the new length of the array after the elements have been added": function () {
+      var testArray = [4, 5, 6];
+      var result = unshift(testArray, 1, 2, 3);
+      seq(result, 6);
+    },
+    "It should insert all arguments passed into unshift() together in order": function () {
+      var testArray = [4, 5, 6];
+      unshift(testArray, 1, 2, 3);
+      seq(testArray.length, 6);
+      seq(testArray[0], 1);
+      seq(testArray[1], 2);
+      seq(testArray[2], 3);
+      seq(testArray[3], 4);
+      seq(testArray[4], 5);
+      seq(testArray[5], 6);
+    },
+    "It should return the original length of the array if no arguments are passed": function () {
+      // debugger;
+      var testArray = [4, 5, 6];
+      var result = unshift(testArray);
+      seq(result, 3);
+    },
+  });
+</script>

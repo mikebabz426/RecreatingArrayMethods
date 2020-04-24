@@ -1,0 +1,75 @@
+<script src="../simpletest.js"></script>
+<script>
+  //Notes:
+  //Syntax:  arr.indexOf(searchElement[, fromIndex])
+  //It should return the first index at which a given element can be found in the array
+  //It should return -1, if the searchElement is not present within the array
+  //If optionalIndex is provided, it should start the search from that index
+  //If no optionalIndex is provided, function will execute from index 0
+  //If a negative number is provided for optionalIndex, the entire array will be searched.
+
+  function indexOf(originalArray, searchElement, optionalIndex) {
+    if (arguments.length < 3) {
+      var index = 0;
+    } else if (optionalIndex >= 0) {
+      index = optionalIndex;
+    } else if (optionalIndex < 0) {
+      index = optionalIndex + originalArray.length;
+      if (index < 0) {
+        return -1;
+      }
+    }
+
+    for (var i = index; i < originalArray.length; i++) {
+      if (searchElement === originalArray[i]) {
+        return i;
+      }
+    }
+    return -1;
+  }
+
+  tests({
+    "It should return the index of the searchElement provided if it is within the array": function () {
+      var testArray = ["apple", "orange", "peach", "pineapple"];
+
+      result = indexOf(testArray, "peach");
+      seq(result, 2);
+    },
+    "It should return the index of the FIRST instance of the item within the array ": function () {
+      var testArray = ["apple", "orange", "peach", "orange", "pineapple"];
+
+      result = indexOf(testArray, "orange");
+      seq(result, 1);
+    },
+    "It should return -1 if the searchElement is not present within the array": function () {
+      var testArray = ["apple", "orange", "peach", "pineapple"];
+
+      result = indexOf(testArray, "banana");
+      seq(result, -1);
+    },
+    "It should start the search from the optionalIndex if one is provided": function () {
+      var testArray = ["apple", "orange", "peach", "pineapple", "orange"];
+
+      result = indexOf(testArray, "orange", 2);
+      seq(result, 4);
+    },
+    "If no optionalIndex is provided, function will execute from index 0": function () {
+      var testArray = ["apple", "orange", "peach", "pineapple"];
+
+      result = indexOf(testArray, "apple");
+      seq(result, 0);
+    },
+    "It should take a negative optionalIndex as the offset from the end of the array": function () {
+      var testArray = ["apple", "orange", "peach", "pineapple"];
+
+      result = indexOf(testArray, "apple", -4);
+      seq(result, 0);
+    },
+    "It should work for strings or numbers": function () {
+      var testArray = [4, 5, 6, 7];
+
+      result = indexOf(testArray, 4);
+      seq(result, 0);
+    },
+  });
+</script>

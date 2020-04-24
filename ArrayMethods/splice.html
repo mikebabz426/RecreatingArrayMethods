@@ -1,0 +1,199 @@
+<script src="../simpletest.js"></script>
+<script>
+  //Notes:
+
+  //Syntax:  arrDeletedItems = array.splice(start[, deleteCount[, item1[, item2[, ...]]]])
+
+  //Changes the contents of an array by removing or replacing existing elements and/or adding new elements in place
+
+  //Paramaters:
+
+  //Start Index: The Index at which to start changing the array
+  //    -If greater than the length of the array, will be set to the length,
+  //    (in this case it will not delete, but add elements to the array based on itemN)
+  //    -If negative it will be used as an offset from array.lenth
+  //    -If array.length + start is less than 0, it will begin from index 0
+
+  //deleteCount:  An integer indicating the # of elements in the array to remove from start
+  //    -If ommited, or its value is equal to or larger than array.length - start, then all elements
+  //    from start will be deleted
+  //    -If deleteCount is 0 or negative, no elements are removed, and you should specify elements to add
+
+  //ItemN: The element or elements to add to the array begining from start
+  //    -If you do not specify any elements to add, splice() will only remove elements from the array
+
+  //Return Value: An array containing the deleted elements
+  //    -If only one element is removed, an array of that one element will be returned
+  //    -If no elements are removed, an empty array is returned
+
+  //EDGE CASE:  If the specified number of elements to insert differs from the number of elements being removed, the array's length will be different at the end of the call.
+
+  function splice(array, startIndex, deleteCount) {
+    var length = array.length;
+    var deletedItems = [];
+    var postDeleteArr = [];
+    var preAddArr = [];
+    var postAddArr = [];
+    var start;
+    var endDeleteIndex = start;
+    var toDelete;
+
+    //SETTING START VALUE
+    if (startIndex >= length) {
+      start = length;
+    } else if (startIndex >= 0 && startIndex < length) {
+      start = startIndex;
+    } else if (startIndex < 0 && length + startIndex >= 0) {
+      start = length + startIndex;
+    } else {
+      start = 0;
+    }
+    //SETTING DELETE VALUE
+    if (deleteCount > length - start) {
+      toDelete = length - start;
+    } else if (deleteCount <= 0) {
+      toDelete = 0;
+    } else {
+      toDelete = deleteCount;
+    }
+
+    var endDeleteIndex = start + toDelete - 1;
+    // START VALUE ONLY
+    if (arguments.length === 2) {
+      for (var i = length; i > start; i--) {
+        deletedItems.push(array[i - 1]);
+        array.length--;
+        if (i === startIndex + 1) {
+          deletedItems.reverse();
+        }
+      }
+      //START AND DELETE VALUE ONLY
+    } else if (arguments.length === 3) {
+      for (var i = 0; i < length; i++) {
+        //CREATES AN ARRAY TO STORE THE VALUES LEFT AFTER DELETION
+        if (i < start) {
+          postDeleteArr.push(array[i]);
+        } else if (i > endDeleteIndex) {
+          postDeleteArr.push(array[i]);
+        } else {
+          deletedItems.push(array[i]);
+        }
+      }
+      //CHANGING ORIGINAL ARRAY
+      array.length = array.length - toDelete;
+      for (var i = 0; i < array.length; i++) {
+        array[i] = postDeleteArr[i];
+      }
+    } else {
+      var addedElements = [];
+      var itemCount = arguments.length - 3;
+      //CREATING AN ARRAY COMPRISED OF ALL ITEMS TO ADD
+      for (var i = 3; i < arguments.length; i++) {
+        addedElements.push(arguments[i]);
+      }
+
+      for (var j = 0; j < length; j++) {
+        if (j < start) {
+          preAddArr.push(array[j]);
+        } else if (i >= start) {
+          postAddArr.push(array[j]);
+        }
+      }
+
+      var newArray = preAddArr.concat(addedElements, postAddArr);
+      for (var k = 0; k < newArray.length; k++) {
+        array[k] = newArray[k];
+      }
+    }
+
+    return deletedItems;
+  }
+
+  tests({
+    "It should return an empty array if called without any arguments": function () {
+      var testArray = [1, 2, 3];
+      var result = splice(testArray);
+      seq(Array.isArray(result), true);
+      seq(result.length, 0);
+    },
+    "It should delete all elements from startIndex to the end of the array, if there is no deleteCount": function () {
+      // debugger;
+      var testArray = [1, 2, 3];
+      splice(testArray, 1);
+      seq(testArray.length, 1);
+      seq(testArray[0], 1);
+    },
+    "It should return an array comprised of all deleted elements": function () {
+      // debugger;
+      var testArray = [1, 2, 3];
+      var result = splice(testArray, 1);
+      seq(Array.isArray(result), true);
+      seq(result.length, 2);
+      seq(result[0], 2);
+      seq(result[1], 3);
+    },
+    "It should use startIndex as an offset from array.length if it is negative": function () {
+      var testArray = ["one", "two", "three", "four"];
+      splice(testArray, -2);
+      seq(testArray.length, 2);
+      seq(testArray[0], "one");
+      seq(testArray[1], "two");
+    },
+    "It should set startIndex to 0, if array.length + startIndex is less than 0": function () {
+      var testArray = ["one", "two", "three", "four"];
+      splice(testArray, -5);
+      seq(testArray.length, 0);
+    },
+    "It should take a deleteCount, specifying the amount of elements to be deleted from the array": function () {
+      var testArray = ["one", "two", "three", "four"];
+      // debugger;
+      splice(testArray, 1, 2);
+      seq(testArray.length, 2);
+      seq(testArray[0], "one");
+      seq(testArray[1], "four");
+    },
+    "It should delete all elements from startIndex to end of array if deleteCount is greater than or equal to array.length - startIndex": function () {
+      var testArray = ["one", "two", "three", "four"];
+      splice(testArray, 1, 5);
+      seq(testArray.length, 1);
+      seq(testArray[0], "one");
+    },
+    "It should not delete any items if deleteCount is 0 or a negative integer": function () {
+      var testArray = ["one", "two", "three", "four"];
+      var result = splice(testArray, 1, -1);
+      seq(testArray.length, 4);
+      seq(result.length, 0);
+      seq(testArray[0], "one");
+      seq(testArray[1], "two");
+      seq(testArray[2], "three");
+      seq(testArray[3], "four");
+    },
+    "It should take an optionalItem argument, in order to add elements to the array from startIndex": function () {
+      // debugger;
+      var testArray = [1, 2, 3];
+      splice(testArray, 1, 0, "added element");
+      seq(testArray[1], "added element");
+    },
+    "It should set startIndex to array.length, if it is greater than array.length": function () {
+      var testArray = [1, 2, 3, 4, 5];
+      splice(testArray, 8, 0, "added element");
+      seq(testArray.length, 6);
+      seq(testArray[5], "added element");
+    },
+    "It should accept multiple arguments for items to add to the array": function () {
+      var testArray = [1, 2, 3, 4, 5];
+      splice(
+        testArray,
+        8,
+        0,
+        "added element",
+        "another element",
+        "and another"
+      );
+      seq(testArray.length, 8);
+      seq(testArray[5], "added element");
+      seq(testArray[6], "another element");
+      seq(testArray[7], "and another");
+    },
+  });
+</script>

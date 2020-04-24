@@ -1,0 +1,66 @@
+<script src="../simpletest.js"></script>
+<script>
+  //Notes:
+
+  //Syntax:  a.reverse()
+
+  //Reverses an array, the first element becomes the last and vice versa
+
+  //Returns the reversed array
+
+  //If array is empty, return an empty array
+
+  function reverse(array) {
+    if (Array.isArray(array) === false) {
+      throw TypeError("Reverse not called on array object");
+    }
+    var length = array.length;
+    var arrayCopy = [];
+
+    for (var i = 0; i < length; i++) {
+      arrayCopy[i] = array[i];
+      array[i] = arrayCopy[length - i - 1];
+    }
+    for (var i = 0; i < length; i++) {
+      array[i] = arrayCopy[length - i - 1];
+    }
+
+    return array;
+  }
+
+  tests({
+    "It should reverse the array reverse() was called on": function () {
+      // debugger;
+      var testArray = [1, 2, 3];
+      reverse(testArray);
+      seq(testArray[0], 3);
+      seq(testArray[1], 2);
+      seq(testArray[2], 1);
+    },
+    "It should return the reversed array": function () {
+      var testArray = [1, 2, 3];
+      var result = reverse(testArray);
+      seq(testArray, result);
+    },
+    "It should return an empty array if called on an empty array": function () {
+      var testArray = [];
+      var result = reverse(testArray);
+      seq(testArray, result);
+    },
+    "It should not modify the length of the array called on": function () {
+      var testArray = [1];
+      reverse(testArray);
+      seq(testArray.length, 1);
+    },
+    "It should throw a TypeError if not called on an array": function () {
+      var isTypeError = false;
+      var notAnArray = { course: "watch and code" };
+      try {
+        reverse(notAnArray);
+      } catch (e) {
+        var isTypeError = e instanceof TypeError;
+      }
+      eq(isTypeError, true);
+    },
+  });
+</script>

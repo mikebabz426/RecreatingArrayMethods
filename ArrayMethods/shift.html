@@ -1,0 +1,61 @@
+<script src="../simpletest.js"></script>
+<script>
+  //Notes:
+
+  //Syntax:  arr.shift()
+
+  //Removes the first element from an array and returns that element.
+  //Changes the length of the array
+  //Returns undefined if the array is empty
+  //It should work for removing holes
+
+  function shift(array) {
+    var length = array.length;
+
+    if (length === 0) {
+      return undefined;
+    }
+
+    for (var i = 0; i < length; i++) {
+      if (i === 0) {
+        var returnValue = array[i];
+      }
+      array[i] = array[i + 1];
+      if (i === length - 1) {
+        array.length = array.length - 1;
+      }
+    }
+    return returnValue;
+  }
+
+  tests({
+    "It should remove the first element from the array it was called on": function () {
+      // debugger;
+      var testArray = [1, 2, 3];
+      shift(testArray);
+      seq(testArray.length, 2);
+      seq(testArray[0], 2);
+    },
+    "It should change the length of the array to array.length - 1": function () {
+      var testArray = [1, 2, 3, 4];
+      shift(testArray);
+      seq(testArray.length, 3);
+    },
+    "It should work for removing holes from an array": function () {
+      // debugger;
+      var testArray = [, , , 1, 2, 3];
+      shift(testArray);
+      seq(testArray.length, 5);
+    },
+    "It should return undefined if called on an empty array": function () {
+      var testArray = [];
+      var result = shift(testArray);
+      seq(result, undefined);
+    },
+    "It should return the value of the element which was removed": function () {
+      var testArray = [5, 8, 7, 3];
+      result = shift(testArray);
+      seq(result, 5);
+    },
+  });
+</script>
